@@ -34,9 +34,9 @@ if($rowCount){
         <meta property="og:title" content="<?php echo SITE_NAME;?> - <?php echo $rowData['full_name'];?> - <?php echo $rowData['finix_name'];?>" />
         <meta property="og:description" content="Help them uncover their spy fantasy." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="<?php echo SITE_URL.'share.php?token='.md5($rowData['id']);?>" />
-        <meta property="og:image" content="<?php echo SITE_URL.'uploads/share/'.$rowData['share'];?>" />
-        <meta property="og:video" content="<?php echo SITE_URL.'assets/Incoming-Call.mp4';?>" />
+        <meta property="og:url" content="<?php echo SITE_URL.'/share.php?token='.md5($rowData['id']);?>" />
+        <meta property="og:image" content="<?php echo $rowData['image'];?>" />
+        <meta property="og:video" content="<?php echo SITE_URL.'/assets/Incoming-Call.mp4';?>" />
         <meta property="og:site_name" content="<?php echo SITE_NAME;?>" />
         <script type='text/javascript' src='https://platform-api.sharethis.com/js/sharethis.js#property=6452220e2b13e7001a69027e&product=sop' async='async'></script>
         <!-- Google Tag Manager -->
@@ -138,7 +138,7 @@ if($rowCount){
                     <div class="final-screen-wrap">
                     <div id="capture-area">
                         <div class="top-row">
-                            <div class="thumb"><img src="<?php echo SITE_URL .'/uploads/profiles/'.$rowData['image'];?>" id="eeveelutions"/>
+                            <div class="thumb"><img src="<?php echo $rowData['image'];?>" id="eeveelutions"/>
                             <canvas id="canvasimg" width="100%" height="212" style="position: absolute;left: 0; top: 0; width: 100%; height: 212px;"></canvas>
                             <div class="overlay"><img src="assets/final-thumb-overlay.png" /></div>
                         </div> 

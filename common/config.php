@@ -25,7 +25,7 @@ if($_SERVER['HTTP_HOST'] == 'test.core'){
 	define('DB_USERNAME', 'root');
 	define('DB_PASSWORD', 'WugWeb123@');
 	define('SITE_NAME', 'UNCOVER YOUR FANTASY?');
-	$CurPageURL = 'http://'. $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ;
+	$CurPageURL = 'http://'. $_SERVER['HTTP_HOST'].'/wu';
 	define('SITE_URL', $CurPageURL);
 	define('SECRET_KEY',  'DER34Rdfgdfggggfgee90XZ' );
 	$allowed_domains = array(

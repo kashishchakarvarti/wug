@@ -41,9 +41,9 @@ if($rowCount){
         <meta property="og:title" content="<?php echo SITE_NAME;?> - <?php echo $rowData['full_name'];?> - <?php echo $rowData['finix_name'];?>" />
         <meta property="og:description" content="Help them uncover their spy fantasy." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="<?php echo SITE_URL.'share.php?token='.md5($rowData['id']);?>" />
-        <meta property="og:image" content="<?php echo SITE_URL.'uploads/share/'.$rowData['share'];?>" />
-        <meta property="og:video" content="<?php echo SITE_URL.'assets/Incoming-Call.mp4';?>" />
+        <meta property="og:url" content="<?php echo SITE_URL.'/share.php?token='.md5($rowData['id']);?>" />
+        <meta property="og:image" content="<?php echo $rowData['image'];?>" />
+        <meta property="og:video" content="<?php echo SITE_URL.'/assets/Incoming-Call.mp4';?>" />
         <meta property="og:site_name" content="<?php echo SITE_NAME;?>" />
         <!-- Google Tag Manager -->
         <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -204,8 +204,8 @@ if($rowCount){
                         <div class="btns" id="control-area">
                             <ul>
                                 <li class="share">
-                                    <!-- <a target="_blank" href="https://www.facebook.com/sharer.php?u=<?php echo (SITE_URL.'share.php?token='.md5($rowData['id']));?>"><img src="assets/share.png" /></a> -->
-                                    <a target="_blank" href="<?php echo (SITE_URL.'share.php?share=true&token='.md5($rowData['id']));?>"><img src="assets/share.png" /></a>
+                                    <!-- <a target="_blank" href="https://www.facebook.com/sharer.php?u=<?php echo (SITE_URL.'/share.php?token='.md5($rowData['id']));?>"><img src="assets/share.png" /></a> -->
+                                    <a id="share-button-click"><img src="assets/share.png" /></a>
                                 </li>
                                 <li><button class="btn" onclick="downloadImage()"><img src="assets/download.png"/></button></li>
                             </ul>
@@ -217,6 +217,27 @@ if($rowCount){
         <div class="btm-circle"><img src="assets/circle.png" /></div>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
         <script src='https://html2canvas.hertzen.com/dist/html2canvas.min.js'></script>
+        <script>
+            const shareButton = document.querySelector('#share-button-click');
+
+            shareButton.addEventListener('click', event => {
+                event.preventDefault()
+                const urlShare = "<?php echo (SITE_URL.'/share.php?share=true&token='.md5($rowData['id']));?>";
+            if (navigator.share) {
+                navigator.share({
+                    title: '<?php echo SITE_NAME; ?>',
+                    url: urlShare
+                }).then(() => {
+                    console.log('Thanks for sharing!');
+                })
+                .catch((e) => {
+                    // window.open(urlShare, "_blank")
+                });
+            } else {
+                window.open(urlShare, "_blank")
+            }
+            });
+        </script>
         <script>
 
         const img = document.getElementById("eeveelutions");
@@ -241,42 +262,42 @@ if($rowCount){
         };
 
 
-           window.onload = function(){
-              html2canvas(document.getElementById('share-screen'), {
-                allowTaint: true,
-                backgroundColor: 'transparent',
-                useCORS: true,
-                scale: window.devicePixelRatio,
-              } ).then(
-                function(canvas) {
-                  let downloadButton = document.getElementById('btn-download'),
-                      imgageData = canvas.toDataURL("image/png");
-                      var $data = {
-                        'user_id' : sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_ID"),
-                        'user_session_id' : sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_SESSION_ID"),
-                        'type': 'share',
-                        'file': imgageData
-                    };
-                    $.ajax({
-                        type: 'POST',
-                        url: 'process-form.php',
-                        data: $data,
-                        success: function(response) {
-                            var res = JSON.parse(response);
-                            if(res.result == "success"){
-                            }else{
-                            }
-                        },
-                        error: function(response) {
-                        },
-                    });
-                      // Now browser starts downloading it instead of just showing it
-                      imgageData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
-                  downloadButton.setAttribute('download', "<?php echo md5($_SESSION['SERVER_USER_ID']);?>"+'-share.png');
-                  downloadButton.setAttribute('href', imgageData);
-                }
-              );
-            }
+        //    window.onload = function(){
+        //       html2canvas(document.getElementById('share-screen'), {
+        //         allowTaint: true,
+        //         backgroundColor: 'transparent',
+        //         useCORS: true,
+        //         scale: window.devicePixelRatio,
+        //       } ).then(
+        //         function(canvas) {
+        //           let downloadButton = document.getElementById('btn-download'),
+        //               imgageData = canvas.toDataURL("image/png");
+        //               var $data = {
+        //                 'user_id' : sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_ID"),
+        //                 'user_session_id' : sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_SESSION_ID"),
+        //                 'type': 'share',
+        //                 'file': imgageData
+        //             };
+        //             $.ajax({
+        //                 type: 'POST',
+        //                 url: 'process-form.php',
+        //                 data: $data,
+        //                 success: function(response) {
+        //                     var res = JSON.parse(response);
+        //                     if(res.result == "success"){
+        //                     }else{
+        //                     }
+        //                 },
+        //                 error: function(response) {
+        //                 },
+        //             });
+        //               // Now browser starts downloading it instead of just showing it
+        //               imgageData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
+        //           downloadButton.setAttribute('download', "<?php echo md5($_SESSION['SERVER_USER_ID']);?>"+'-share.png');
+        //           downloadButton.setAttribute('href', imgageData);
+        //         }
+        //       );
+        //     }
 
             function downloadImage(){
               html2canvas(document.getElementById('share-screen'), {

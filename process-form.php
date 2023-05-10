@@ -2,7 +2,7 @@
 include_once('common/config.php');
 include_once('common/s3-upload.php');
 
-function uploadthumb($filename, $fileData, $orientation) {
+function uploadthumb($filename, $fileData, $orientation, $file_key) {
 	$im = imagecreatefromstring($fileData);
 
 	$deg = 0;
@@ -42,7 +42,29 @@ function uploadthumb($filename, $fileData, $orientation) {
 
 	$file = uploadFile($tmpDir, $filename);
 
-	unset($tmpDir);
+	$videFileName = $file_key.'.mp4';
+	$videFileName_tmp_name = $file_key.'_tmp.mp4';
+
+	$videoFile =  './uploads/tmp/'.$videFileName;
+	$videFileName_tmp =  './uploads/tmp/'.$videFileName_tmp_name;
+	$sdadad =  __DIR__.'/uploads/tmp/'.$videFileName_tmp_name;
+
+	$textFile =  './uploads/tmp/'.$file_key.'.txt';
+
+	exec('ffmpeg -framerate 40 -loop 1 -i '.$tmpDir.' -c:v libx264 -x264opts stitchable -t 1 -r 30 '.$videFileName_tmp);
+
+	file_put_contents($textFile, array('file '.__DIR__.'/main.mp4', PHP_EOL, 'file '.$sdadad, PHP_EOL), FILE_APPEND | LOCK_EX);
+
+	exec('ffmpeg -f concat -safe 0 -i '.$textFile.' -c:v copy '.$videoFile);
+
+	$video_file = uploadFile($videoFile, $videFileName);
+	
+	// exec('ffmpeg -f concat -i '.$textFile.' -c copy '.$videoFile);
+
+	unlink($tmpDir);
+	unlink($textFile);
+	unlink($videFileName_tmp);
+	unlink($videoFile);
 	
 	imagedestroy($im);
 
@@ -220,11 +242,14 @@ if (true) {
 			else 
 				$file_type = 'other';
 			if(in_array($file_type, ['jpeg', 'png', 'gif'])) {
-				$file_name = uniqid() . '-' . time() . '.' . $file_type;
+				$file_name = uniqid() . '-' . time();
 
-				$filePath = uploadthumb($file_name, $file_data, $ewew);
-				// uploadthumb('./uploads/profiles/'.$file_name, $file_data, $ewew);
-				// file_put_contents('./uploads/profiles/'.$file_name, $file_data);
+				$filePath = uploadthumb($file_name. '.' . $file_type, $file_data, $ewew, $file_name);
+				$sqlUpdateContact = "UPDATE `".TBL_REGISTERED_USERS."`  
+					SET `image` = '".$conn->real_escape_string($filePath)."', 
+					`updated`   = '".date('Y-m-d H:i:s')."'
+					WHERE `id`  = '".$conn->real_escape_string($_SESSION['SERVER_USER_ID'])."'";
+				$resultUpdateContact = $conn->query($sqlUpdateContact);
 				$result = array("result"=> 'success', "message" => "Image uploaded successfully", 'file_url' => $filePath);
 			}else {
 				$result = array("result"=> 'error', "message" => "Only JPEG, PNG & GIF allowed");
@@ -232,53 +257,30 @@ if (true) {
 		}else{
 			$result = array("result"=> 'error', "message" => "Session not set!", 'redirect' => 'index.php?session-image');
 		}
-	}else if (isset($_POST['type']) && !empty($_POST['type']) && ($_POST['type'] == 'share')) {
-		if(isset($_SESSION['SERVER_USER_SESSION_ID']) && isset($_SESSION['SERVER_USER_IP_ADDRESS']) && isset($_SESSION['SERVER_USER_CITYNAME']) && isset($_SESSION['SERVER_USER_ID'])){
-			$sqlSelectContact = "SELECT * FROM `".TBL_REGISTERED_USERS."`  
-									WHERE `session_id` = '".$conn->real_escape_string($_SESSION['SERVER_USER_SESSION_ID'])."'
-									AND `ip_address` = '".$conn->real_escape_string($_SESSION['SERVER_USER_IP_ADDRESS'])."'
-									AND `city_name` = '".$conn->real_escape_string($_SESSION['SERVER_USER_CITYNAME'])."'
-									AND `id` = '".$conn->real_escape_string($_SESSION['SERVER_USER_ID'])."'
-									AND	`status` = '1'";
-			$resultSelectContact = $conn->query($sqlSelectContact);
-			$numRows = $resultSelectContact->num_rows;
-			if($numRows > 0){
-				$rowData = mysqli_fetch_assoc($resultSelectContact);
-				if(!isset($rowData['share']) || empty($rowData['share'])){
-					list($type, $data) = explode(';', $_POST['file']);
-					list(, $data) = explode(',', $data);
-					$file_data = base64_decode($data);
-					$finfo = finfo_open();
-					$file_mime_type = finfo_buffer($finfo, $file_data, FILEINFO_MIME_TYPE);
-					if($file_mime_type == 'image/jpeg' || $file_mime_type == 'image/jpg')
-						$file_type = 'jpeg';
-					else if($file_mime_type == 'image/png')
-						$file_type = 'png';
-					else if($file_mime_type == 'image/gif')
-						$file_type = 'gif';
-					else 
-						$file_type = 'other';
-					if(in_array($file_type, ['jpeg', 'png', 'gif'])) {
-						$file_name = md5($rowData['id']) . '-share.' . $file_type;
-						file_put_contents('./uploads/share/'.$file_name, $file_data);
-						$sqlUpdateContact = "UPDATE `".TBL_REGISTERED_USERS."`  
-												SET `share` = '".$conn->real_escape_string($file_name)."', 
-												`updated`   = '".date('Y-m-d H:i:s')."'
-												WHERE `id`  = '".$conn->real_escape_string($_SESSION['SERVER_USER_ID'])."'";
-						$resultUpdateContact = $conn->query($sqlUpdateContact);
-						$result = array("result"=> 'success', "message" => "Share Image uploaded successfully", 'file_name' => $file_name, 'file_url' => SITE_URL.'/uploads/share/'.$file_name);
-					}else {
-						$result = array("result"=> 'error', "message" => "Only JPEG, PNG & GIF allowed");
-					}
-				}else {
-					$result = array("result"=> 'success', "message" => "Image allready shared", 'file_name' => $rowData['share'], 'file_url' => SITE_URL.'/uploads/share/'.$rowData['share']);
-				}
-			}else{
-				$result = array("result"=> 'error', "message" => "Invalid credentails! Please try again.");
-			}
-		}else{
-			$result = array("result"=> 'error', "message" => "Session not set!", 'redirect' => 'index.php?session-share');
-		}
+	} else if (isset($_POST['type']) && !empty($_POST['type']) && ($_POST['type'] == 'share')) {
+		// if(isset($_SESSION['SERVER_USER_SESSION_ID']) && isset($_SESSION['SERVER_USER_IP_ADDRESS']) && isset($_SESSION['SERVER_USER_CITYNAME']) && isset($_SESSION['SERVER_USER_ID'])){
+		// 	$sqlSelectContact = "SELECT * FROM `".TBL_REGISTERED_USERS."`  
+		// 							WHERE `session_id` = '".$conn->real_escape_string($_SESSION['SERVER_USER_SESSION_ID'])."'
+		// 							AND `ip_address` = '".$conn->real_escape_string($_SESSION['SERVER_USER_IP_ADDRESS'])."'
+		// 							AND `city_name` = '".$conn->real_escape_string($_SESSION['SERVER_USER_CITYNAME'])."'
+		// 							AND `id` = '".$conn->real_escape_string($_SESSION['SERVER_USER_ID'])."'
+		// 							AND	`status` = '1'";
+		// 	$resultSelectContact = $conn->query($sqlSelectContact);
+		// 	$numRows = $resultSelectContact->num_rows;
+		// 	if($numRows > 0){
+		// 		// $rowData = mysqli_fetch_assoc($resultSelectContact);
+		// 		// if(!isset($rowData['share']) || empty($rowData['share'])){
+					
+		// 		// 	$result = array("result"=> 'success', "message" => "Share Image uploaded successfully", 'file_name' => $file_name, 'file_url' => SITE_URL.'/uploads/share/'.$file_name);
+		// 		// }else {
+		// 		// 	$result = array("result"=> 'success', "message" => "Image allready shared", 'file_name' => $rowData['share'], 'file_url' => SITE_URL.'/uploads/share/'.$rowData['share']);
+		// 		// }
+		// 	}else{
+		// 		$result = array("result"=> 'error', "message" => "Invalid credentails! Please try again.");
+		// 	}
+		// }else{
+		// 	$result = array("result"=> 'error', "message" => "Session not set!", 'redirect' => 'index.php?session-share');
+		// }
 	}else{
 		$result = array("result"=> 'error', "message" => "Invalid process type!");
 	}
