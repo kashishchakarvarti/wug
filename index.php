@@ -559,7 +559,7 @@ img.onload = function () {
                     missionUserFullName = missionUserFullName.toUpperCase();
                     sessionStorage.setItem("<?php echo SITE_NAME;?>_USER_FULL_NAME", missionUserFullName);
                     let acronym = missionUserFullName.split(/\s/).reduce((response,word)=> response+=word.slice(0,1),'');
-                    let finixName = acronym+'_'+"<?php echo $spyNameArray[rand(0,11)];?>";
+                    let finixName = acronym+'_'+"<?php echo $spyNameArray[rand(0,10)];?>";
                     sessionStorage.setItem("<?php echo SITE_NAME;?>_USER_FINIX_NAME", finixName);
                     sessionStorage.setItem("<?php echo SITE_NAME;?>_USER_UPLOAD_IMAGE", false);
                     $(".section-four").fadeOut("slow");
@@ -765,7 +765,7 @@ img.onload = function () {
                             var res = JSON.parse(response);
                             if(res.result == "success"){
                                 sessionStorage.setItem("<?php echo SITE_NAME;?>_USER_UPLOAD_IMAGE", true);
-                                sessionStorage.setItem("<?php echo SITE_NAME;?>_USER_IMAGE", res.file_name);
+                                sessionStorage.setItem("<?php echo SITE_NAME;?>_USER_IMAGE", res.file_url);
                                 $(".final-text").html(sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_IP_CITY_NAME"));
                                 $(".final-agent-name").html(sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_FINIX_NAME"));
                                 $(".final-real-name").html(sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_FULL_NAME"));

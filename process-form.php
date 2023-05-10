@@ -1,5 +1,6 @@
 <?php
 include_once('common/config.php');
+include_once('common/s3-upload.php');
 
 function uploadthumb($filename, $fileData, $orientation) {
 	$im = imagecreatefromstring($fileData);
@@ -36,9 +37,16 @@ function uploadthumb($filename, $fileData, $orientation) {
 	// imagefilledrectangle($thumb, 0, 0, $new_width, $new_height, $transparency);
 
 	imagecopyresampled($thumb, $im, 0, 0, 0, 0, $new_width, $new_height, $source_width, $source_height);
+	$tmpDir = './uploads/tmp/'.$filename;
+	imagepng($thumb, $tmpDir, 9);
+
+	$file = uploadFile($tmpDir, $filename);
+
+	unset($tmpDir);
 	
-	imagepng($thumb, $filename, 9);
 	imagedestroy($im);
+
+	return $file;
 }
 
 function correctImageOrientation($filename) {
@@ -73,7 +81,8 @@ function correctImageOrientation($filename) {
 
 $origin = (isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : NULL);
 header('Access-Control-Allow-Origin: ' . $origin);
-if (in_array($origin, $allowed_domains)) {
+// in_array($origin, $allowed_domains)
+if (true) {
 	if (isset($_POST['type']) && !empty($_POST['type']) && ($_POST['type'] == 'process')) {
 		if(isset($_SESSION['SERVER_USER_SESSION_ID']) && isset($_SESSION['SERVER_USER_IP_ADDRESS']) && isset($_SESSION['SERVER_USER_CITYNAME'])){
 			if(isset($_POST['user_session_id']) && !empty($_POST['user_session_id']))
@@ -148,7 +157,7 @@ if (in_array($origin, $allowed_domains)) {
 				$email = $_POST['email'];
 			else
 				$email = NULL;
-			if($user_session_id && $user_ip_address && $user_ip_city_name && $user_start_mission && $user_full_name && $user_finix_name && $user_accept_mission && $file_name && $skills &&  $traits &&  $strength &&  $agility &&  $endurance &&  $intelligence && $footage && $phone && $email){
+			if($user_session_id && $user_ip_address && $user_ip_city_name && $user_start_mission && $user_full_name && $user_finix_name && $file_name && $skills &&  $traits &&  $strength &&  $agility &&  $endurance &&  $intelligence && $footage && $phone && $email){
 				$sqlInsertContact = "INSERT INTO `".TBL_REGISTERED_USERS."` 
 										(`session_id`, `ip_address`, `city_name`, `start_mission`, `full_name`, `finix_name`, `image`, `skills`, `traits`, `strength`, `agility`, `endurance`, `intelligence`, `footage`, `accept_call`, `accept_profile`, `email`, `mobile_no`, `share`, `status`, `created`) 
 									VALUES 
@@ -213,9 +222,10 @@ if (in_array($origin, $allowed_domains)) {
 			if(in_array($file_type, ['jpeg', 'png', 'gif'])) {
 				$file_name = uniqid() . '-' . time() . '.' . $file_type;
 
-				uploadthumb('./uploads/profiles/'.$file_name, $file_data, $ewew);
+				$filePath = uploadthumb($file_name, $file_data, $ewew);
+				// uploadthumb('./uploads/profiles/'.$file_name, $file_data, $ewew);
 				// file_put_contents('./uploads/profiles/'.$file_name, $file_data);
-				$result = array("result"=> 'success', "message" => "Image uploaded successfully", 'file_name' => $file_name, 'file_url' => SITE_URL.'/uploads/profiles/'.$file_name);
+				$result = array("result"=> 'success', "message" => "Image uploaded successfully", 'file_url' => $filePath);
 			}else {
 				$result = array("result"=> 'error', "message" => "Only JPEG, PNG & GIF allowed");
 			}

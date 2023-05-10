@@ -145,11 +145,11 @@ if($rowCount){
                     <div id="capture-area">
                         <div class="top-row">
                             <div class="thumb bwWrapper">
-                                <!-- <img src="<?php echo './uploads/profiles/'.$rowData['image'];?>" id="eeveelutions"/> -->
+                                <!-- <img src="<?php echo $rowData['image'];?>" id="eeveelutions"/> -->
                                 <div style="width: 100%;
     height: 210px;
     background-size: cover;
-    background-position: center;    background-image: url(<?php echo './uploads/profiles/'.$rowData['image'];?>);">
+    background-position: center;    background-image: url(<?php echo $rowData['image'];?>);">
         </div>
                                 <canvas id="canvasimg" width="100%" height="200" style="position: absolute;left: 0; top: 0; width: 100%; height: 200px;"></canvas>
                                 <div class="overlay"><img src="assets/final-thumb-overlay.png" /></div>

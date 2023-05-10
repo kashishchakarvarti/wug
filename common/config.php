@@ -21,11 +21,12 @@ if($_SERVER['HTTP_HOST'] == 'test.core'){
 	date_default_timezone_set('Asia/Kolkata');
 	ini_set('display_errors', 0);
 	define('DB_HOST', 'localhost');
-	define('DB_NAME', 'u615761582_citadel');
-	define('DB_USERNAME', 'u615761582_fantasy');
+	define('DB_NAME', 'u615761582_fantasy');
+	define('DB_USERNAME', 'root');
 	define('DB_PASSWORD', 'WugWeb123@');
 	define('SITE_NAME', 'UNCOVER YOUR FANTASY?');
-	define('SITE_URL', 'https://uncoveryourfantasy.com/citadel/');
+	$CurPageURL = 'http://'. $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'] ;
+	define('SITE_URL', $CurPageURL);
 	define('SECRET_KEY',  'DER34Rdfgdfggggfgee90XZ' );
 	$allowed_domains = array(
 		'http://uncoveryourfantasy.com',
