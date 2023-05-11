@@ -91,38 +91,44 @@ function uploadVideo($filename, $fileData, $orientation, $file_key) {
 
 	$videFileName = $file_key.'.mp4';
 	$videFileName_tmp_name = $file_key.'_tmp.mp4';
+	$videFileName_tmp__name_ts = $file_key.'_tmp.ts';
 
 	$videoFile =  './uploads/tmp/'.$videFileName;
 	$videFileName_tmp =  './uploads/tmp/'.$videFileName_tmp_name;
-	$sdadad =  __DIR__.'/uploads/tmp/'.$videFileName_tmp_name;
+	$videFileName_tmp_ts =  './uploads/tmp/'.$videFileName_tmp__name_ts;
 
-	$textFile =  './uploads/tmp/'.$file_key.'.txt';
+	// $sdadad =  __DIR__.'/uploads/tmp/'.$videFileName_tmp_name;
 
-	// exec('ffmpeg -framerate 1 -loop 1 -i '.$tmpDir.' -c:v libx264 -r 30 '.$videFileName_tmp);
+	// $textFile =  './uploads/tmp/'.$file_key.'.txt';
+
+	exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 -b:v 2476K -pix_fmt yuv420p -vf scale=378:650 -video_track_timescale 25k '.$videFileName_tmp);
+	exec('ffmpeg -i '.$videFileName_tmp.' -c copy '.$videFileName_tmp_ts);
+	exec('ffmpeg -i "concat:./main.ts|'.$videFileName_tmp_ts.'" -c copy '.$videoFile);
 
 	// file_put_contents($textFile, array('file '.__DIR__.'/main.mp4', PHP_EOL, 'file '.$sdadad, PHP_EOL), FILE_APPEND | LOCK_EX);
 
 	// exec('ffmpeg -f concat -safe 0 -i '.$textFile.' -c copy '.$videoFile);
 
-	$ffmpeg = FFMpeg\FFMpeg::create();
+	// $ffmpeg = FFMpeg\FFMpeg::create();
 
-	$video44 = $ffmpeg->open(__DIR__.'/uploads/tmp/main.mp4'); 
-	$video44
-    ->save(new FFMpeg\Format\Video\X264(), __DIR__.'/uploads/tmp/main_newy.mp4');
+	// $video44 = $ffmpeg->open(__DIR__.'/uploads/tmp/main.mp4'); 
+	// $video44
+    // ->save(new FFMpeg\Format\Video\X264(), __DIR__.'/uploads/tmp/main_newy.mp4');
 
 	// $video = $ffmpeg->open(__DIR__.'/main.mp4'); 
 	// $video
 	// 	->concat([__DIR__.'/main.mp4', __DIR__.'/uploads/tmp/oooooooo.mp4'])
 	// 	->saveFromSameCodecs(__DIR__.'/uploads/tmp/vvvvvvvvv.mp4', true);
 
-	// 	$video_file = uploadFile($videoFile, $videFileName);
+		$video_file = uploadFile($videoFile, $videFileName);
 	
 	// exec('ffmpeg -f concat -i '.$textFile.' -c copy '.$videoFile);
 
-	// unlink($tmpDir);
+	unlink($tmpDir);
 	// unlink($textFile);
-	// unlink($videFileName_tmp);
-	// unlink($videoFile);
+	unlink($videFileName_tmp_ts);
+	unlink($videFileName_tmp);
+	unlink($videoFile);
 	
 	imagedestroy($im);
 

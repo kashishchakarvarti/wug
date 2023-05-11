@@ -203,11 +203,12 @@ if($rowCount){
                         </div>
                         <div class="btns" id="control-area">
                             <ul>
-                                <li class="share">
+                                <li class="share action-btn-no-loading">
                                     <!-- <a target="_blank" href="https://www.facebook.com/sharer.php?u=<?php echo (SITE_URL.'/share.php?token='.md5($rowData['id']));?>"><img src="assets/share.png" /></a> -->
                                     <a id="share-button-click"><img src="assets/share.png" /></a>
                                 </li>
-                                <li><button id='download-btn-profile' class="btn" onclick="downloadImage()"><img src="assets/download.png"/></button></li>
+                                <li><button class="btn action-btn-no-loading" onclick="downloadImage()"><img src="assets/download.png"/></button></li>
+                                <li class="btn" style="display: none;" id="upload-Image_submit-loading"><img src="assets/b2.gif"/><span> <div class="text">Loading...</div></span></li>
                             </ul>
                         </div>
                     </div>
@@ -300,8 +301,18 @@ if($rowCount){
         //     }
 
             function downloadImage(){
-                const shareButton = document.querySelector('#download-btn-profile');
-                shareButton.disabled = true;
+
+                const vide = sessionStorage.getItem("<?php echo SITE_NAME;?>_VIDEO");
+                if(vide) {
+                    window.open(vide, "_blank")
+                    return;
+                }
+
+                const actionButton = document.querySelector('.action-btn-no-loading');
+                const loadingButton = document.querySelector('#upload-Image_submit-loading');
+                loadingButton.css("display","block");
+                actionButton.css("display","none");
+                
               html2canvas(document.getElementById('share-screen'), {
                 allowTaint: true,
                 backgroundColor: 'transparent',
@@ -311,45 +322,53 @@ if($rowCount){
                 function(canvas) {
                         let imgageData = canvas.toDataURL("image/png");
 
-                        imgageData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
+                    //     imgageData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
 
-                      const downloadLink = document.createElement('a');
-                        document.body.appendChild(downloadLink);
+                    //   const downloadLink = document.createElement('a');
+                    //     document.body.appendChild(downloadLink);
 
-                        downloadLink.href = imgageData;
-                        downloadLink.target = '_self';
-                        downloadLink.download = "<?php echo md5($_SESSION['SERVER_USER_ID']);?>"+'-share.png';
-                        downloadLink.click(); 
+                    //     downloadLink.href = imgageData;
+                    //     downloadLink.target = '_self';
+                    //     downloadLink.download = "<?php echo md5($_SESSION['SERVER_USER_ID']);?>"+'-share.png';
+                    //     downloadLink.click(); 
 
                     // -----------------------------
 
                     // imgageData = canvas.toDataURL("image/png");
-                    // var $data = {
-                    //     'user_id' : sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_ID"),
-                    //     'user_session_id' : sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_SESSION_ID"),
-                    //     'type': 'video',
-                    //     'file': imgageData
-                    // };
-                    // $.ajax({
-                    //     type: 'POST',
-                    //     url: 'process-form.php',
-                    //     data: $data,
-                    //     success: function(response) {
-                    //         shareButton.disabled = false;
-                    //         var res = JSON.parse(response);
-                    //         alert(res.file_url)
-                    //         if(res.result == "success"){
-                    //         }else{
-                    //         }
-                    //     },
-                    //     error: function(response) {
-                    //         shareButton.disabled = false;
-                    //     },
-                    // });    
+                    var $data = {
+                        'user_id' : sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_ID"),
+                        'user_session_id' : sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_SESSION_ID"),
+                        'type': 'video',
+                        'file': imgageData
+                    };
+                    $.ajax({
+                        type: 'POST',
+                        url: 'process-form.php',
+                        data: $data,
+                        success: function(response) {
+                loadingButton.css("display","none");
+                actionButton.css("display","block");
+                            try {
+                                var res = JSON.parse(response);
+                                if(res.result == "success") {
+                                    sessionStorage.setItem("<?php echo SITE_NAME;?>_VIDEO", res.file_url);
+                                    window.open(res.file_url, "_blank")
+                                }else{
+                                }
+                            } catch (error) {
+                                
+                            }
+                        },
+                        error: function(response) {
+                loadingButton.css("display","none");
+                actionButton.css("display","block");
+                        },
+                    });    
 
                 }
               ).catch((e) => {
-                shareButton.disabled = false;
+                loadingButton.css("display","none");
+                actionButton.css("display","block");
               })
             }
         </script>

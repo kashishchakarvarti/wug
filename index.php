@@ -506,14 +506,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </ul>
 </div>
     </div>
-        
+    <audio controls loop>
+  <source src="assets/phone-ring.mp3">
+</audio>
         <div class="btm-circle"><img src="assets/circle.png" /></div>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/lity/2.4.1/lity.min.js" integrity="sha512-UU0D/t+4/SgJpOeBYkY+lG16MaNF8aqmermRIz8dlmQhOlBnw6iQrnt4Ijty513WB3w+q4JO75IX03lDj6qQNA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://unpkg.com/typer-dot-js@0.1.0/typer.js"></script>
-        <script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js'></script>
+        <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/jquery-ui.min.js'></script>
         <script src="src-file/jquery.BlackAndWhite.min.js"></script>
         <script>
+
+
+var audio = new Audio(
+  "assets/phone-ring.mp3"
+);
+function play() {
+  audio.play();
+}
+
+function pause() {
+  audio.pause();
+}
+
+
+
 
 const img = document.getElementById("eeveelutions");
 const canvas = document.getElementById("canvasimg");
@@ -579,7 +596,9 @@ img.onload = function () {
                 //if(sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_UPLOAD_IMAGE") == true){
                     $(".section-five").fadeOut("slow");
                     $(".section-six").fadeIn("slow");
+                    audio.play();
                     $(".progress span").addClass("act4");
+
                 //}else{
                     //alert(sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_UPLOAD_IMAGE"));
                 //}
@@ -627,6 +646,7 @@ img.onload = function () {
                                     $(".section-seven").fadeIn("slow");
                                      $('#movie1')[0].play();
                                      $("#movie1").prop('muted', false);
+                                     audio.pause();
                     }
                        el.style.webkitTransform = 'translateX(' + curX + 'px)'; 
                 }, false);
