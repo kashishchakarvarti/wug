@@ -207,7 +207,7 @@ if($rowCount){
                                     <!-- <a target="_blank" href="https://www.facebook.com/sharer.php?u=<?php echo (SITE_URL.'/share.php?token='.md5($rowData['id']));?>"><img src="assets/share.png" /></a> -->
                                     <a id="share-button-click"><img src="assets/share.png" /></a>
                                 </li>
-                                <li><button class="btn" onclick="downloadImage()"><img src="assets/download.png"/></button></li>
+                                <li><button id='download-btn-profile' class="btn" onclick="downloadImage()"><img src="assets/download.png"/></button></li>
                             </ul>
                         </div>
                     </div>
@@ -300,6 +300,8 @@ if($rowCount){
         //     }
 
             function downloadImage(){
+                const shareButton = document.querySelector('#download-btn-profile');
+                shareButton.disabled = true;
               html2canvas(document.getElementById('share-screen'), {
                 allowTaint: true,
                 backgroundColor: 'transparent',
@@ -307,23 +309,48 @@ if($rowCount){
                 scale: window.devicePixelRatio,
               } ).then(
                 function(canvas) {
-                    let   imgageData = canvas.toDataURL("image/png");
-                //   let downloadButton = document.getElementById('btn-download'),
-                     
-                //       // Now browser starts downloading it instead of just showing it
-                      imgageData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
-                //   downloadButton.setAttribute('download', "<?php echo md5($_SESSION['SERVER_USER_ID']);?>"+'-share.png');
-                //   downloadButton.setAttribute('href', imgageData);
+                        let imgageData = canvas.toDataURL("image/png");
 
-                  const downloadLink = document.createElement('a');
-                    document.body.appendChild(downloadLink);
+                        imgageData = imgageData.replace(/^data:image\/png/, "data:application/octet-stream");
 
-                    downloadLink.href = imgageData;
-                    downloadLink.target = '_self';
-                    downloadLink.download = "<?php echo md5($_SESSION['SERVER_USER_ID']);?>"+'-share.png';
-                    downloadLink.click(); 
+                      const downloadLink = document.createElement('a');
+                        document.body.appendChild(downloadLink);
+
+                        downloadLink.href = imgageData;
+                        downloadLink.target = '_self';
+                        downloadLink.download = "<?php echo md5($_SESSION['SERVER_USER_ID']);?>"+'-share.png';
+                        downloadLink.click(); 
+
+                    // -----------------------------
+
+                    // imgageData = canvas.toDataURL("image/png");
+                    // var $data = {
+                    //     'user_id' : sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_ID"),
+                    //     'user_session_id' : sessionStorage.getItem("<?php echo SITE_NAME;?>_USER_SESSION_ID"),
+                    //     'type': 'video',
+                    //     'file': imgageData
+                    // };
+                    // $.ajax({
+                    //     type: 'POST',
+                    //     url: 'process-form.php',
+                    //     data: $data,
+                    //     success: function(response) {
+                    //         shareButton.disabled = false;
+                    //         var res = JSON.parse(response);
+                    //         alert(res.file_url)
+                    //         if(res.result == "success"){
+                    //         }else{
+                    //         }
+                    //     },
+                    //     error: function(response) {
+                    //         shareButton.disabled = false;
+                    //     },
+                    // });    
+
                 }
-              );
+              ).catch((e) => {
+                shareButton.disabled = false;
+              })
             }
         </script>
     </body>

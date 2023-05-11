@@ -1,4 +1,5 @@
 <?php
+require 'vendor/autoload.php';
 include_once('common/config.php');
 include_once('common/s3-upload.php');
 
@@ -42,6 +43,52 @@ function uploadthumb($filename, $fileData, $orientation, $file_key) {
 
 	$file = uploadFile($tmpDir, $filename);
 
+	unlink($tmpDir);
+	
+	imagedestroy($im);
+
+	return $file;
+}
+
+
+function uploadVideo($filename, $fileData, $orientation, $file_key) {
+	$im = imagecreatefromstring($fileData);
+
+	$deg = 0;
+	switch ($orientation) {
+		case 3:
+		$deg = 180;
+		break;
+		case 6:
+		$deg = 270;
+		break;
+		case 8:
+		$deg = 90;
+		break;
+	}
+	if ($deg) {
+		$im = imagerotate($im, $deg, 0);        
+	}
+
+	imagefilter($im, IMG_FILTER_GRAYSCALE);
+	// imagefilter($im, IMG_FILTER_CONTRAST, -100);
+	$source_width = imagesx($im);
+	$source_height = imagesy($im);
+
+	$ratio =  $source_height / $source_width;
+
+	$new_width = 300; // assign new width to new resized image
+	$new_height = $ratio * 300;
+
+	$thumb = imagecreatetruecolor($new_width, $new_height);
+
+	// $transparency = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
+	// imagefilledrectangle($thumb, 0, 0, $new_width, $new_height, $transparency);
+
+	imagecopyresampled($thumb, $im, 0, 0, 0, 0, $new_width, $new_height, $source_width, $source_height);
+	$tmpDir = './uploads/tmp/'.$filename;
+	imagepng($thumb, $tmpDir, 9);
+
 	$videFileName = $file_key.'.mp4';
 	$videFileName_tmp_name = $file_key.'_tmp.mp4';
 
@@ -51,24 +98,35 @@ function uploadthumb($filename, $fileData, $orientation, $file_key) {
 
 	$textFile =  './uploads/tmp/'.$file_key.'.txt';
 
-	exec('ffmpeg -framerate 40 -loop 1 -i '.$tmpDir.' -c:v libx264 -x264opts stitchable -t 1 -r 30 '.$videFileName_tmp);
+	// exec('ffmpeg -framerate 1 -loop 1 -i '.$tmpDir.' -c:v libx264 -r 30 '.$videFileName_tmp);
 
-	file_put_contents($textFile, array('file '.__DIR__.'/main.mp4', PHP_EOL, 'file '.$sdadad, PHP_EOL), FILE_APPEND | LOCK_EX);
+	// file_put_contents($textFile, array('file '.__DIR__.'/main.mp4', PHP_EOL, 'file '.$sdadad, PHP_EOL), FILE_APPEND | LOCK_EX);
 
-	exec('ffmpeg -f concat -safe 0 -i '.$textFile.' -c:v copy '.$videoFile);
+	// exec('ffmpeg -f concat -safe 0 -i '.$textFile.' -c copy '.$videoFile);
 
-	$video_file = uploadFile($videoFile, $videFileName);
+	$ffmpeg = FFMpeg\FFMpeg::create();
+
+	$video44 = $ffmpeg->open(__DIR__.'/uploads/tmp/main.mp4'); 
+	$video44
+    ->save(new FFMpeg\Format\Video\X264(), __DIR__.'/uploads/tmp/main_newy.mp4');
+
+	// $video = $ffmpeg->open(__DIR__.'/main.mp4'); 
+	// $video
+	// 	->concat([__DIR__.'/main.mp4', __DIR__.'/uploads/tmp/oooooooo.mp4'])
+	// 	->saveFromSameCodecs(__DIR__.'/uploads/tmp/vvvvvvvvv.mp4', true);
+
+	// 	$video_file = uploadFile($videoFile, $videFileName);
 	
 	// exec('ffmpeg -f concat -i '.$textFile.' -c copy '.$videoFile);
 
-	unlink($tmpDir);
-	unlink($textFile);
-	unlink($videFileName_tmp);
-	unlink($videoFile);
+	// unlink($tmpDir);
+	// unlink($textFile);
+	// unlink($videFileName_tmp);
+	// unlink($videoFile);
 	
 	imagedestroy($im);
 
-	return $file;
+	return $video_file;
 }
 
 function correctImageOrientation($filename) {
@@ -218,7 +276,7 @@ if (true) {
 		}else{
 			$result = array("result"=> 'error', "message" => "Session not set!", 'redirect' => 'index.php?session-process');
 		}
-	}else if (isset($_POST['type']) && !empty($_POST['type']) && ($_POST['type'] == 'image')) {
+	} else if (isset($_POST['type']) && !empty($_POST['type']) && ($_POST['type'] == 'image')) {
 		if(isset($_SESSION['SERVER_USER_SESSION_ID']) && isset($_SESSION['SERVER_USER_IP_ADDRESS']) && isset($_SESSION['SERVER_USER_CITYNAME'])){
 			list($type, $data) = explode(';', $_POST['file']);
 			list(, $data) = explode(',', $data);
@@ -242,9 +300,48 @@ if (true) {
 			else 
 				$file_type = 'other';
 			if(in_array($file_type, ['jpeg', 'png', 'gif'])) {
-				$file_name = uniqid() . '-' . time();
+				$file_name = md5($_SESSION['SERVER_USER_ID']);
 
 				$filePath = uploadthumb($file_name. '.' . $file_type, $file_data, $ewew, $file_name);
+				$sqlUpdateContact = "UPDATE `".TBL_REGISTERED_USERS."`  
+					SET `image` = '".$conn->real_escape_string($filePath)."', 
+					`updated`   = '".date('Y-m-d H:i:s')."'
+					WHERE `id`  = '".$conn->real_escape_string($_SESSION['SERVER_USER_ID'])."'";
+				$resultUpdateContact = $conn->query($sqlUpdateContact);
+				$result = array("result"=> 'success', "message" => "Image uploaded successfully", 'file_url' => $filePath);
+			}else {
+				$result = array("result"=> 'error', "message" => "Only JPEG, PNG & GIF allowed");
+			}
+		}else{
+			$result = array("result"=> 'error', "message" => "Session not set!", 'redirect' => 'index.php?session-image');
+		}
+	} else if (isset($_POST['type']) && !empty($_POST['type']) && ($_POST['type'] == 'video')) {
+		if(isset($_SESSION['SERVER_USER_SESSION_ID']) && isset($_SESSION['SERVER_USER_IP_ADDRESS']) && isset($_SESSION['SERVER_USER_CITYNAME'])){
+			list($type, $data) = explode(';', $_POST['file']);
+			list(, $data) = explode(',', $data);
+			$file_data = base64_decode($data);
+			$finfo = finfo_open();
+			$file_mime_type = finfo_buffer($finfo, $file_data, FILEINFO_MIME_TYPE);
+
+			$exif = exif_read_data($_POST['file']);
+			$ewew = 0;
+			if(isset($exif['Orientation'])) {
+				$ewew = $exif['Orientation'];
+			}
+			
+
+			if($file_mime_type == 'image/jpeg' || $file_mime_type == 'image/jpg')
+				$file_type = 'jpeg';
+			else if($file_mime_type == 'image/png')
+				$file_type = 'png';
+			else if($file_mime_type == 'image/gif')
+				$file_type = 'gif';
+			else 
+				$file_type = 'other';
+			if(in_array($file_type, ['jpeg', 'png', 'gif'])) {
+				$file_name = md5($_SESSION['SERVER_USER_ID']);
+
+				$filePath = uploadVideo($file_name. '.' . $file_type, $file_data, $ewew, $file_name);
 				$sqlUpdateContact = "UPDATE `".TBL_REGISTERED_USERS."`  
 					SET `image` = '".$conn->real_escape_string($filePath)."', 
 					`updated`   = '".date('Y-m-d H:i:s')."'
