@@ -147,10 +147,10 @@ if($rowCount){
                             <div class="thumb bwWrapper">
                                 <!-- <img src="<?php echo $rowData['image'];?>" id="eeveelutions"/> -->
                                 <div style="width: 100%;
-    height: 210px;
-    background-size: cover;
-    background-position: center;    background-image: url(<?php echo $rowData['image'];?>);">
-        </div>
+                                    height: 210px;
+                                    background-size: cover;
+                                    background-position: center;background-image: url(<?php echo $rowData['image'];?>);">
+                                </div>
                                 <canvas id="canvasimg" width="100%" height="200" style="position: absolute;left: 0; top: 0; width: 100%; height: 200px;"></canvas>
                                 <div class="overlay"><img src="assets/final-thumb-overlay.png" /></div>
                         </div>
@@ -203,11 +203,11 @@ if($rowCount){
                         </div>
                         <div class="btns" id="control-area">
                             <ul>
-                                <li class="share action-btn-no-loading">
+                                <li class="share action-btn-no-loading" id="action-btn-no-loading-1">
                                     <!-- <a target="_blank" href="https://www.facebook.com/sharer.php?u=<?php echo (SITE_URL.'/share.php?token='.md5($rowData['id']));?>"><img src="assets/share.png" /></a> -->
                                     <a id="share-button-click"><img src="assets/share.png" /></a>
                                 </li>
-                                <li><button class="btn action-btn-no-loading" onclick="downloadImage()"><img src="assets/download.png"/></button></li>
+                                <li  id="action-btn-no-loading-2"><button class="btn action-btn-no-loading" onclick="downloadImage()"><img src="assets/download.png"/></button></li>
                                 <li class="btn" style="display: none;" id="upload-Image_submit-loading"><img src="assets/b2.gif"/><span> <div class="text">Loading...</div></span></li>
                             </ul>
                         </div>
@@ -241,26 +241,26 @@ if($rowCount){
         </script>
         <script>
 
-        const img = document.getElementById("eeveelutions");
+        // const img = document.getElementById("eeveelutions");
         const canvas = document.getElementById("canvasimg");
         const ctx = canvas.getContext("2d");
 
-        img.onload = function () {
-          img.crossOrigin = "anonymous";
-          ctx.drawImage(img, 0, 0);
-          const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          for (i = 0; i < imgData.data.length; i += 4) {
-            let count = imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2];
-            let colour = 0;
-            if (count > 383) colour = 255;
+        // img.onload = function () {
+        //   img.crossOrigin = "anonymous";
+        //   ctx.drawImage(img, 0, 0);
+        //   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        //   for (i = 0; i < imgData.data.length; i += 4) {
+        //     let count = imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2];
+        //     let colour = 0;
+        //     if (count > 383) colour = 255;
 
-            imgData.data[i] = colour;
-            imgData.data[i + 1] = colour;
-            imgData.data[i + 2] = colour;
-            imgData.data[i + 3] = 255;
-          }
-          ctx.putImageData(imgData, 0, 0);
-        };
+        //     imgData.data[i] = colour;
+        //     imgData.data[i + 1] = colour;
+        //     imgData.data[i + 2] = colour;
+        //     imgData.data[i + 3] = 255;
+        //   }
+        //   ctx.putImageData(imgData, 0, 0);
+        // };
 
 
         //    window.onload = function(){
@@ -301,17 +301,19 @@ if($rowCount){
         //     }
 
             function downloadImage(){
-
                 const vide = sessionStorage.getItem("<?php echo SITE_NAME;?>_VIDEO");
-                if(vide) {
-                    window.open(vide, "_blank")
-                    return;
-                }
+                // if(vide) {
+                //     fetchFile(vide)
+                //     return;
+                // }
 
-                const actionButton = document.querySelector('.action-btn-no-loading');
+                const actionButton1 = document.querySelector('#action-btn-no-loading-1');
+                const actionButton2 = document.querySelector('#action-btn-no-loading-2');
                 const loadingButton = document.querySelector('#upload-Image_submit-loading');
-                loadingButton.css("display","block");
-                actionButton.css("display","none");
+
+                loadingButton.style.display = "block"
+                actionButton1.style.display = "none"
+                actionButton2.style.display = "none"
                 
               html2canvas(document.getElementById('share-screen'), {
                 allowTaint: true,
@@ -346,13 +348,12 @@ if($rowCount){
                         url: 'process-form.php',
                         data: $data,
                         success: function(response) {
-                loadingButton.css("display","none");
-                actionButton.css("display","block");
                             try {
                                 var res = JSON.parse(response);
                                 if(res.result == "success") {
                                     sessionStorage.setItem("<?php echo SITE_NAME;?>_VIDEO", res.file_url);
-                                    window.open(res.file_url, "_blank")
+                                    fetchFile(res.file_url)
+                                    // window.open(res.file_url, "_blank")
                                 }else{
                                 }
                             } catch (error) {
@@ -360,16 +361,47 @@ if($rowCount){
                             }
                         },
                         error: function(response) {
-                loadingButton.css("display","none");
-                actionButton.css("display","block");
+                            loadingButton.style.display = "none"
+                            actionButton1.style.display = "block"
+                            actionButton2.style.display = "block"
                         },
                     });    
 
                 }
               ).catch((e) => {
-                loadingButton.css("display","none");
-                actionButton.css("display","block");
+                            loadingButton.style.display = "none"
+                            actionButton1.style.display = "block"
+                            actionButton2.style.display = "block"
               })
+            }
+
+
+            function fetchFile(url) {
+                const actionButton1 = document.querySelector('#action-btn-no-loading-1');
+                const actionButton2 = document.querySelector('#action-btn-no-loading-2');
+                const loadingButton = document.querySelector('#upload-Image_submit-loading');
+                fetch(url).then(res => res.blob()).then(file => {
+                    let tempUrl = URL.createObjectURL(file);
+                    const aTag = document.createElement("a");
+                    aTag.href = tempUrl;
+                    aTag.download = url.replace(/^.*[\\\/]/, '');
+                    document.body.appendChild(aTag);
+                    aTag.click();
+                    // downloadBtn.innerText = "Download File";
+                    URL.revokeObjectURL(tempUrl);
+                    aTag.remove();
+                    
+                    loadingButton.style.display = "none"
+                            actionButton1.style.display = "block"
+                            actionButton2.style.display = "block"
+                }).catch(() => {
+                    // alert("Failed to download file!");
+                    // downloadBtn.innerText = "Download File";
+                    
+                    loadingButton.style.display = "none"
+                            actionButton1.style.display = "block"
+                            actionButton2.style.display = "block"
+                });
             }
         </script>
     </body>

@@ -52,6 +52,9 @@ transition: all .5s ease-in-out;
  top: 0;
  flex-direction: column;
 }
+audio{
+  opacity: 0;
+}
 .wrapper .cont .loading{
   font-size: 22px;
   color: #EC1C24;
@@ -379,6 +382,9 @@ transition: all .5s ease-in-out;
     .tacbox a{
       color: #FECF73;
     }
+    .tacbox.error,  .tacbox.error a{
+      color: #EC1C24;
+    }
     .frame1 input {
       height: 1.2rem;
       width: 1.2em;
@@ -395,6 +401,7 @@ transition: all .5s ease-in-out;
       margin: 0px;
       padding: 0px;
   }
+
   .frame2 .biscuit{
       width: 60%;
       margin: 0rem auto 1rem auto;
@@ -1826,4 +1833,34 @@ video:-webkit-full-screen::-webkit-media-text-track-container {
 }
 
 
+}
+
+.wrapper .cont12 {
+  width: 85%;
+  height: 85%;
+  margin: 0px;
+  padding: 0px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  left: 35px;
+  top: 90px;
+  flex-direction: column;
+}
+.error {
+  max-width: 100%;
+  color: #ec0404;
+  font-weight: normal !important;
+  text-align: center;
+  padding: 0.2rem 0;
+  display: inline-block;
+}
+.section-ten.section.share{
+  transform: translate(-50%, -55%) scale(1);
+}
+.section-ten.section.share .btn{
+  width: 90%;
+  margin: 0px auto;
 }

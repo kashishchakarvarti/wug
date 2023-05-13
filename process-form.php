@@ -70,24 +70,24 @@ function uploadVideo($filename, $fileData, $orientation, $file_key) {
 		$im = imagerotate($im, $deg, 0);        
 	}
 
-	imagefilter($im, IMG_FILTER_GRAYSCALE);
+	// imagefilter($im, IMG_FILTER_GRAYSCALE);
 	// imagefilter($im, IMG_FILTER_CONTRAST, -100);
-	$source_width = imagesx($im);
-	$source_height = imagesy($im);
+	// $source_width = imagesx($im);
+	// $source_height = imagesy($im);
 
-	$ratio =  $source_height / $source_width;
+	// $ratio =  $source_height / $source_width;
 
-	$new_width = 300; // assign new width to new resized image
-	$new_height = $ratio * 300;
+	// $new_width = 300; // assign new width to new resized image
+	// $new_height = $ratio * 300;
 
-	$thumb = imagecreatetruecolor($new_width, $new_height);
+	// $thumb = imagecreatetruecolor($new_width, $new_height);
 
-	// $transparency = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
-	// imagefilledrectangle($thumb, 0, 0, $new_width, $new_height, $transparency);
+	// // $transparency = imagecolorallocatealpha($thumb, 255, 255, 255, 127);
+	// // imagefilledrectangle($thumb, 0, 0, $new_width, $new_height, $transparency);
 
-	imagecopyresampled($thumb, $im, 0, 0, 0, 0, $new_width, $new_height, $source_width, $source_height);
+	// imagecopyresampled($thumb, $im, 0, 0, 0, 0, $new_width, $new_height, $source_width, $source_height);
 	$tmpDir = './uploads/tmp/'.$filename;
-	imagepng($thumb, $tmpDir, 9);
+	imagepng($im, $tmpDir, 9);
 
 	$videFileName = $file_key.'.mp4';
 	$videFileName_tmp_name = $file_key.'_tmp.mp4';
@@ -100,8 +100,12 @@ function uploadVideo($filename, $fileData, $orientation, $file_key) {
 	// $sdadad =  __DIR__.'/uploads/tmp/'.$videFileName_tmp_name;
 
 	// $textFile =  './uploads/tmp/'.$file_key.'.txt';
-
-	exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 -b:v 2476K -pix_fmt yuv420p -vf scale=378:650 -video_track_timescale 25k '.$videFileName_tmp);
+	// exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 -b:v 2476K -pix_fmt yuv420p -vf scale=378:650 -video_track_timescale 25k '.$videFileName_tmp);
+	// -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1"
+	
+	exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 -b:v 2476K -pix_fmt yuv420p -vf "scale=378:650:force_original_aspect_ratio=decrease,pad=378:650:-1:-1:color=black" '.$videFileName_tmp);
+	// exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 '.$videFileName_tmp);
+	// exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 '.$videFileName_tmp);
 	exec('ffmpeg -i '.$videFileName_tmp.' -c copy '.$videFileName_tmp_ts);
 	exec('ffmpeg -i "concat:./main.ts|'.$videFileName_tmp_ts.'" -c copy '.$videoFile);
 
@@ -348,11 +352,6 @@ if (true) {
 				$file_name = md5($_SESSION['SERVER_USER_ID']);
 
 				$filePath = uploadVideo($file_name. '.' . $file_type, $file_data, $ewew, $file_name);
-				$sqlUpdateContact = "UPDATE `".TBL_REGISTERED_USERS."`  
-					SET `image` = '".$conn->real_escape_string($filePath)."', 
-					`updated`   = '".date('Y-m-d H:i:s')."'
-					WHERE `id`  = '".$conn->real_escape_string($_SESSION['SERVER_USER_ID'])."'";
-				$resultUpdateContact = $conn->query($sqlUpdateContact);
 				$result = array("result"=> 'success', "message" => "Image uploaded successfully", 'file_url' => $filePath);
 			}else {
 				$result = array("result"=> 'error', "message" => "Only JPEG, PNG & GIF allowed");

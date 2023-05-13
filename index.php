@@ -225,7 +225,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         <div class="mid-head">Authenticate your identity.</div>
                         <div class="name-cont">
                             <ul>
-                                <li><input type="text" placeholder="ENTER FULL NAME" name="name" id="name"  onkeydown="return /[a-z]/i.test(event.key)" /></li>
+                                <li><input type="text" placeholder="ENTER FULL NAME" name="name" id="name"  onkeydown="return /^[a-zA-Z ]*$/i.test(event.key)" /></li>
                                 <li>
                                     <button class="begin btn" type="submit"><img src="assets/b1.gif"/><span>Submit</span></button>
                                 </li>
@@ -407,9 +407,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                         </div>
                         <div class="mid-head">Save your agent profile by entering your details.</div>
                         <div class="name-cont">
+                            
                             <ul>
-                                <li><input type="number" placeholder="PHONE REQUIRED" name="phone" id="phone" ></li>
-                                <li><input type="email" placeholder="EMAIL REQUIRED" name="email" id="email"></li>
+                                <li><input type="text" placeholder="PHONE REQUIRED" name="phone" id="phone" maxlength="10"  oninput="this.value = this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" ></li>
+                                <li><input type="email" placeholder="EMAIL REQUIRED" name="email" id="email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"></li>
                                 <li><button class="send-data btn" type="submit"><img src="assets/b1.gif"/><span>submit</span></button></li>
                             </ul>
                         </div>
@@ -417,78 +418,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     
                 </div>
             </div>
-            <div class="section-ten section" id="share-screen">
-                <div class="bg">
-                    <img src="assets/final-screen.png" class="mobile" />
-                </div>
-                <div class="cont top-align">
-                    <div class="final-screen-wrap">
-                    <div id="capture-area">
-                        <div class="top-row">
-                            <div class="thumb">
-                                <img src="assets/final-thumb.png" id="eeveelutions"/>
-                                <canvas id="canvasimg" width="100%" height="212" style="position: absolute;left: 0; top: 0; width: 100%; height: 212px;"></canvas>
-                                <div class="overlay"><img src="assets/final-thumb-overlay.png" /></div>
-                        </div>
-                            <div class="right-col">
-                                <div class="location">
-                                    <img src="assets/location-bg.png" />
-                                    <div class="text final-text">
-                                        <?php echo $cityName;?>
-                                    </div>
-                                </div>
-                                <div class="name-card">
-                                    <img src="assets/name-plate.png" />
-                                    <div class="wrap">
-                                        <div class="agent-name final-agent-name"></div>
-                                        <div class="real-name final-real-name"></div>
-                                        <div class="special-skills">
-                                            <h3>SPECIAL SKILL:</h3>
-                                            <p><?php echo $skills;?></p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="btm-row">
-                            <div class="traits">
-                                <img src="assets/traits.png" />
-                                <div class="content"><?php echo $traits;?></div>
-                            </div>
-                        </div>
-                        <div class="last-location">
-                            <img src="assets/last-location.png" alt="" />
-                            <div class="content">
-                                <div class="left">
-                                    <ul>
-                                        <li>STRENGTH: <?php echo $strength;?>%</li>
-                                        <li>AGILITY: <?php echo $agility;?>%</li>
-                                        <li>ENDURANCE: <?php echo $endurance;?>%</li>
-                                        <li>INTELLIGENCE: <?php echo $intelligence;?>%</li>
-                                    </ul>
-                                </div>
-                                <div class="right">
-                                    <img src="<?php echo SITE_URL.'/footage/'.$footage;?>" alt="" class="img1" />
-                                    <img src="<?php echo SITE_URL.'/footage/'.$footage;?>" alt="" class="img2" />
-                                </div>
-                            </div>
-                        </div>
-                        <div class="btm-logo"><img src="assets/dark-fantasyxcitadel-logo.png" alt="" /></div>
-                        </div>
-                        <div class="share-cont">
-                            <h4>Share with friends</h4>
-                            <h5>Help them uncover their spy fantasy.</h5>
-                            <p>Tag  <a href="https://www.instagram.com/sunfeastdarkfantasy/?hl=en">@sunfeastdarkfantasy</a> on Instagram with #UncoverYourFantasy</p>
-                        </div>
-                        <div class="btns" id="control-area">
-                            <ul>
-                                <li class="share btn"><img src="assets/b2.gif"/><span><div class="icon"><img src="assets/share-icon.png" alt=""></div> <div class="text">share</div> </span></li>
-                                <li><a id="btn-download" class="btn" href=""><img src="assets/b1.gif"/><span>download</span></a></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div> 
+             
         </div>
 
         <div id="inline" style="overflow:auto;background:#000; color:#fff; padding:20px;width:600px;max-width:100%;border-radius:6px" class="lity-hide">
@@ -506,8 +436,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </ul>
 </div>
     </div>
-    <audio controls loop>
+    <audio style="
+    display: none;
+" controls loop>
   <source src="assets/phone-ring.mp3">
+</audio>
+<audio class="bg-music" style="display: none;" controls loop>
+  <source src="assets/bg-music.mp3">
 </audio>
         <div class="btm-circle"><img src="assets/circle.png" /></div>
         <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
@@ -529,29 +464,20 @@ function pause() {
   audio.pause();
 }
 
+var bgaudio = new Audio(
+  "assets/bg-music.mp3"
+);
+function play() {
+    bgaudio.play();
+}
+
+function pause() {
+    bgaudio.pause();
+}
 
 
 
-const img = document.getElementById("eeveelutions");
-const canvas = document.getElementById("canvasimg");
-const ctx = canvas.getContext("2d");
 
-img.onload = function () {
-  img.crossOrigin = "anonymous";
-  ctx.drawImage(img, 0, 0);
-  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  for (i = 0; i < imgData.data.length; i += 4) {
-    let count = imgData.data[i] + imgData.data[i + 1] + imgData.data[i + 2];
-    let colour = 0;
-    if (count > 383) colour = 255;
-
-    imgData.data[i] = colour;
-    imgData.data[i + 1] = colour;
-    imgData.data[i + 2] = colour;
-    imgData.data[i + 3] = 255;
-  }
-  ctx.putImageData(imgData, 0, 0);
-};
 
 
 
@@ -559,6 +485,7 @@ img.onload = function () {
            // $(".btm-circle").delay(3000).fadeOut("slow");
             $(".section-two").delay(3100).fadeIn("slow");
             $(".progress span").addClass("act1");
+            
             $(".start-mission").click(function () {
                 let startMissionChecked = $('#checkbox')[0].checked;
                 if(startMissionChecked == true){
@@ -568,6 +495,11 @@ img.onload = function () {
                     $(".section-three").delay(3000).fadeOut("slow");
                     $(".section-four").delay(3100).fadeIn("slow");
                     $(".progress span").addClass("act2");
+                    bgaudio.play();
+                }
+                else{
+                    $(".tacbox").addClass("error");
+                    
                 }
             });
             $(".name-cont button.begin").click(function () {

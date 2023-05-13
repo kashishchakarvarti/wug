@@ -130,7 +130,7 @@ if($rowCount){
     </div>
         <div class="container"></div>
         <div class="wrapper">
-            <div class="section-ten section" id="share-screen" style="display:block;">
+            <div class="section-ten section share" id="share-screen" style="display:block;">
                 <div class="bg">
                     <img src="assets/final-screen.png" class="mobile" />
                 </div>
@@ -185,12 +185,8 @@ if($rowCount){
                         <div class="btm-logo"><img src="assets/dark-fantasyxcitadel-logo.png" alt="" /></div>
                         </div>
                         <div class="share-cont">
-                            <h4>Share with friends</h4>
-                            <h5>Help them uncover their spy fantasy.</h5>
-                            <p>Tag  <a href="https://www.instagram.com/sunfeastdarkfantasy/?hl=en">@sunfeastdarkfantasy</a> on Instagram with #UncoverYourFantasy</p>
-                        </div>
-                        <div class="btns" id="control-area">
-                            <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons"></div><!-- ShareThis END -->
+                            <div class="btn"><a href="index.php"><img src="assets/restart.png" alt=""></a></div>
+                            
                         </div>
                     </div>
                 </div>
