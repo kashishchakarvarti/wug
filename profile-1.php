@@ -1,4 +1,6 @@
 <?php
+phpinfo();
+die;
 include_once('common/config.php');
 if(isset($_SESSION['SERVER_USER_ID']) && isset($_SESSION['SERVER_USER_SESSION_ID']) && isset($_SESSION['SERVER_USER_IP_ADDRESS']) && isset($_SESSION['SERVER_USER_CITYNAME'])){
 

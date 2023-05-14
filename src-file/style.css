@@ -1472,6 +1472,7 @@ h2 {
 }
 .caller-thumb .overlay{
   width: 100%;
+  height: 120px;
   position: absolute;
   left: 0px;
   top: 0px;
@@ -1479,6 +1480,8 @@ h2 {
 }
 .caller-thumb .overlay img{
   width: 100%;
+  height: 100%;
+  display: block;
 }
 .caller-thumb > img{
   width: 100%;

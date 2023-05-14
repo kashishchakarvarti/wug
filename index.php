@@ -199,7 +199,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 </div>
                 <div class="cont">
                     <div class="frame2">
-                        <div class="biscuit"><video src="assets/cookie-loader.mp4" playsinline muted autoplay loop></video></div>
+                        <div class="biscuit">
+                        <video autoplay loop muted playsinline class="video-background ">
+                        <source src="assets/cookie-loader.mp4" type="video/mp4">
+                        </video>    
+                        </div>
                         <div class="loading">
                         L<span
     class="typer"
@@ -579,6 +583,12 @@ function pause() {
                                      $('#movie1')[0].play();
                                      $("#movie1").prop('muted', false);
                                      audio.pause();
+                                     $("#movie1").bind("ended", function() {
+                                        $(".section-seven").fadeOut("slow");
+                                    $(".section-eight").fadeIn("slow");
+});
+                                   
+                                     
                     }
                        el.style.webkitTransform = 'translateX(' + curX + 'px)'; 
                 }, false);
@@ -670,15 +680,7 @@ function pause() {
 
                 }
             });
-            document.addEventListener("DOMContentLoaded", (e) => {
-                var video = document.getElementById("movie1");
-                var prevscreen = document.getElementById("section-seven");
-                var menudisplay = document.getElementById("final-screen");
-                video.addEventListener("ended", (e) => {
-                    prevscreen.style.display = "none";
-                    menudisplay.style.display = "block";
-                });
-            });
+           
             //image uploader code
             const fileInput = document.getElementById("fileUpload");
             const fileInputG = document.getElementById("fileUpload2");

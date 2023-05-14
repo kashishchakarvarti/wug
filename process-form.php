@@ -103,7 +103,10 @@ function uploadVideo($filename, $fileData, $orientation, $file_key) {
 	// exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 -b:v 2476K -pix_fmt yuv420p -vf scale=378:650 -video_track_timescale 25k '.$videFileName_tmp);
 	// -vf "scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1"
 	
+	//curr
 	exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 -b:v 2476K -pix_fmt yuv420p -vf "scale=378:650:force_original_aspect_ratio=decrease,pad=378:650:-1:-1:color=black" '.$videFileName_tmp);
+	
+	// exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 -b:v 2476K -pix_fmt yuv420p -vf "scale=300:515:force_original_aspect_ratio=decrease,pad=300:515:-1:-1:color=black" '.$videFileName_tmp);
 	// exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 '.$videFileName_tmp);
 	// exec('ffmpeg -loop 1 -i '.$tmpDir.' -c:v libx264 -t 3 '.$videFileName_tmp);
 	exec('ffmpeg -i '.$videFileName_tmp.' -c copy '.$videFileName_tmp_ts);

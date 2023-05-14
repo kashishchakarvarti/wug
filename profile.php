@@ -319,7 +319,8 @@ if($rowCount){
                 allowTaint: true,
                 backgroundColor: 'transparent',
                 useCORS: true,
-                scale: window.devicePixelRatio,
+                // scale: window.devicePixelRatio,
+                pixelRatio: 2,
               } ).then(
                 function(canvas) {
                         let imgageData = canvas.toDataURL("image/png");
